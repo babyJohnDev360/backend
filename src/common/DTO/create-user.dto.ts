@@ -18,9 +18,6 @@ class BankDetailsDto {
   @IsString()
   ifsc?: string;
 
-  @IsOptional()
-  @IsString()
-  panNumber?: string;
 }
 
 // Create User DTO class
@@ -33,7 +30,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  panNo: string;
+  panNumber: string;
 
   @IsString()
   password: string;
@@ -57,7 +54,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  panNo?: string;
+  panNumber?: string;
 
   @IsOptional()
   @IsString()

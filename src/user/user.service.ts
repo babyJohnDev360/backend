@@ -37,8 +37,7 @@ export class UserService {
 
       return {
         status: true,
-        message: 'Sign Up Successfull',
-        newUser,
+        message: 'User Created Successfull',
       };
     } catch (error) {
       console.log(error.message);
@@ -64,7 +63,7 @@ export class UserService {
 
     return {
       status: true,
-      messsage: 'Login successfull ',
+      messsage: 'Login successfull',
       token,
     };
   }
@@ -102,22 +101,28 @@ export class UserService {
       return { status: true };
     } catch (error) {
       console.log(error.message);
+      return {
+        status: false,
+        error: error.message,
+      };
     }
   }
 
   async list(query: any) {
     try {
-      const users = await this.UserModel.find()
-        .limit(query.limit)
-        .skip((query.page - 1) * query.limit);
+      const users = await this.UserModel.find().select({password : 0})
       const count = await this.UserModel.countDocuments();
       return {
         status: true,
-        totalPages: Math.ceil(count / query.limit),
+       // totalPages: Math.ceil(count / query.limit),
         users,
       };
     } catch (error) {
       console.log(error.message);
+      return {
+        status: false,
+        error: error.message,
+      };
     }
   }
 
@@ -125,13 +130,14 @@ export class UserService {
   async addfundAllot(userId, createFundAllotDto: CreateFundAllotDto) {
     try {
       const getBalance = await this.getFund(userId, { limit: 1, page: 1 });
-      const existingBalance = getBalance.data[0].balance || 0;
+      const existingBalance = getBalance?.data[0]?.balance || 0;
       console.log(existingBalance);
       
-  
       let balance = createFundAllotDto.type === "add"
         ? existingBalance + createFundAllotDto.amount
         : existingBalance - createFundAllotDto.amount;
+        console.log(balance);
+        
         const payload = { ...createFundAllotDto, userId, balance };
 
        
@@ -139,7 +145,6 @@ export class UserService {
       return {
         status: true,
         message: 'Created Successfully',
-        createdFundAllot
       };
     } catch (error) {
       return {
@@ -166,7 +171,6 @@ export class UserService {
       return {
         status: true,
         message: 'Updated Successfully',
-        updatedFundAllot
       };
     } catch (error) {
       return {
