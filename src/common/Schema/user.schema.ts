@@ -10,9 +10,7 @@ export class BankDetails {
     branch : string;
     @Prop()
     ifsc : string;
-    @Prop()
-    panNumber : string;
-
+   
 }
 export const BankDetailsSchema = SchemaFactory.createForClass(BankDetails)
 @Schema({timestamps : true})
@@ -29,6 +27,9 @@ export class User {
 
     @Prop()
     password  :string ;
+
+    @Prop()
+    panNumber : string;
 
     @Prop({type :BankDetailsSchema} )
     bankDetails  :BankDetails ;

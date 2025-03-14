@@ -10,7 +10,7 @@ export enum FundType {
 
 @Schema({ timestamps: true })
 export class FundAllot {
-  @Prop({ default: () => uuidv4() })
+  @Prop({ default: () => uuidv4().slice(0, 6) })
   transactionId: string;  // UUID auto-generated
 
   @Prop()
