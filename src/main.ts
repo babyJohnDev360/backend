@@ -5,21 +5,21 @@ import * as dotenv from 'dotenv';
 
 async function bootstrap() {
   dotenv.config();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: '*', // Allow all origins (for development purposes)
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific HTTP methods
+      allowedHeaders: 'Content-Type, Accept, Authorization', // Specify allowed headers
+    },
+  });
 
   // Enable global validation pipe
   app.useGlobalPipes(new ValidationPipe());
 
-  // Enable CORS
-  app.enableCors({
-    origin: '*', // Allow all origins (for development purposes)
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific HTTP methods
-    allowedHeaders: 'Content-Type, Accept', // Specify allowed headers
-  });
-
   // Start the server
-  await app.listen(process.env.PORT, async () => {
-    console.log(`Server is running on port no. ${process.env.PORT}`);
+  const port = process.env.PORT || 3000; // Use a default port if the environment variable is not set
+  await app.listen(port, async () => {
+    console.log(`Server is running on port no. ${port}`);
   });
 }
 
