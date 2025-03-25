@@ -1,5 +1,15 @@
 // service-fee.dto.ts
-import { IsNumber, IsString, IsArray, IsNotEmpty, IsMongoId, IsEnum, IsOptional, IsDateString, IsObject } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsArray,
+  IsNotEmpty,
+  IsMongoId,
+  IsEnum,
+  IsOptional,
+  IsDateString,
+  IsObject,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 // DTO for Transaction
@@ -7,7 +17,7 @@ export class TransactionDto {
   @IsDateString()
   data: Date;
 
-  @IsEnum(["fees Paid", "Credit Note Applied"])
+  @IsEnum(['fees Paid', 'Credit Note Applied'])
   type: string;
 
   @IsNumber()
@@ -16,6 +26,9 @@ export class TransactionDto {
 
 // DTO for Creating Service Fee
 export class CreateServiceFeeDto {
+  @IsString()
+  userId: string;
+
   @IsNumber()
   serviceFeePayable: number;
 
@@ -38,7 +51,6 @@ export class CreateServiceFeeDto {
 
 // DTO for Updating Service Fee
 export class UpdateServiceFeeDto {
-
   @IsMongoId()
   serviceFeeId?: string;
 
@@ -64,7 +76,7 @@ export class UpdateServiceFeeDto {
 
   @IsOptional()
   @IsMongoId()
-  userId?: string;  // Reference to the User ID
+  userId?: string; // Reference to the User ID
 
   @IsOptional()
   @IsArray()

@@ -1,13 +1,17 @@
-import { IsNumber, IsString, IsOptional, IsUUID, IsNotEmpty, IsBoolean } from 'class-validator';
-import { Types } from 'mongoose';
+/* eslint-disable prettier/prettier */
+import { IsNumber, IsString, IsOptional, IsUUID, IsNotEmpty, IsBoolean, IsEnum } from 'class-validator';
+import {  Types } from 'mongoose';
 
 // Create FundAllot DTO
 export class CreateFundAllotDto {
+  @IsString()
+  userId: string;
+
   @IsNumber()
   amount: number;
 
-  @IsString()
-  type: string;
+  @IsEnum(["add", "remove"])
+  type: "add" | "remove";
 
   @IsOptional()
   @IsString()
