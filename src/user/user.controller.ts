@@ -66,8 +66,9 @@ export class UserController {
 
   @Post('addFund')
   @UseGuards(AuthGuard)
-  AddFund(@ExtractUserId() @Body() CreateFundAllotDto: CreateFundAllotDto) {
-    return this.userService.addfundAllot(CreateFundAllotDto);
+  AddFund(@ExtractUserId() userAdminId: string,
+   @Body() CreateFundAllotDto: CreateFundAllotDto) {
+    return this.userService.addfundAllot(userAdminId,CreateFundAllotDto);
   }
 
   @Post('updateFund')
@@ -97,18 +98,19 @@ export class UserController {
   @Post('addserviceFee')
   @UseGuards(AuthGuard)
   AddserviceFee(
-    @ExtractUserId() @Body() CreateServiceFeeDto: CreateServiceFeeDto,
+    @ExtractUserId()  userAdminId: string,
+    @Body() CreateServiceFeeDto: CreateServiceFeeDto,
   ) {
-    return this.userService.addserviceFee(CreateServiceFeeDto);
+    return this.userService.addserviceFee(userAdminId,CreateServiceFeeDto);
   }
 
   @Post('updateServiceFee')
   @UseGuards(AuthGuard)
   UpdateServiceFee(
-    @ExtractUserId() userId: string,
+    @ExtractUserId() userAdminId: string,
     @Body() UpdateServiceFeeDto: UpdateServiceFeeDto,
   ) {
-    return this.userService.updateServiceFee(userId, UpdateServiceFeeDto);
+    return this.userService.updateServiceFee(userAdminId, UpdateServiceFeeDto);
   }
 
   @Delete('removeServiceFee')

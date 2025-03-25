@@ -40,6 +40,9 @@ export class User {
     @Prop({default: true})
     isActive: boolean
 
+    @Prop({default: "User"})
+    role: string
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

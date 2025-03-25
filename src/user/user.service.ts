@@ -147,21 +147,21 @@ export class UserService {
     }
   }
 
-  async addfundAllot(createFundAllotDto: CreateFundAllotDto) {
+  async addfundAllot(userAdminId,createFundAllotDto: CreateFundAllotDto) {
     try {
+      const isAdmin = await this.checkUser(userAdminId)
+      if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
       const getBalance = await this.getFund(createFundAllotDto.userId, {
         limit: 1,
         page: 1,
       });
-      console.log(getBalance);
+    
       const existingBalance = getBalance?.data[0]?.balance || 0;
-      console.log(existingBalance);
 
       const balance =
         createFundAllotDto.type === 'add'
           ? existingBalance + createFundAllotDto.amount
           : existingBalance - createFundAllotDto.amount;
-      console.log(balance);
 
       const payload = { ...createFundAllotDto, balance };
 
@@ -254,9 +254,10 @@ export class UserService {
     }
   }
 
-  async addserviceFee(createServiceFeeDto: CreateServiceFeeDto) {
+  async addserviceFee(userAdminId,createServiceFeeDto: CreateServiceFeeDto) {
     try {
-      //const payload = { ...createServiceFeeDto, createServiceFeeDto.userId };
+      const isAdmin = await this.checkUser(userAdminId)
+      if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
       const data = await this.ServiceFeeModel.create(createServiceFeeDto);
       return {
         status: true,
@@ -270,10 +271,11 @@ export class UserService {
     }
   }
 
-  async updateServiceFee(userId, updateServiceFeeDto: UpdateServiceFeeDto) {
+  async updateServiceFee(userAdminId, updateServiceFeeDto: UpdateServiceFeeDto) {
     try {
       const { serviceFeeId, ...updateData } = updateServiceFeeDto;
-
+      const isAdmin = await this.checkUser(userAdminId)
+      if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
       const updatedFundAllot = await this.ServiceFeeModel.findByIdAndUpdate(
         serviceFeeId,
         updateData,
@@ -336,6 +338,24 @@ export class UserService {
         status: false,
         message: error.message,
       };
+    }
+  }
+
+  async checkUser(userId){
+    try {
+      const userData = await this.UserModel.findById(userId)
+      console.log(userData, "userData ");
+      
+      if(userData.role === "Admin"){
+        return  true
+      }else{
+        return false 
+    }
+    } catch (error) {
+      return {
+      status : false ,
+      message : error.message
+      }
     }
   }
 }
