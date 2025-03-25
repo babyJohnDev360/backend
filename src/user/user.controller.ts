@@ -33,10 +33,10 @@ export class UserController {
   @Post('signup')
   // @UseInterceptors(FileInterceptor('image'))
   SignUp(
-    //  @UploadedFile() file: Express.Multer.File,
+    @ExtractUserId() userAdminId: string,
     @Body() createUserDto: CreateUserDto,
   ) {
-    return this.userService.SignUp(createUserDto);
+    return this.userService.SignUp(userAdminId,createUserDto);
   }
 
   @Post('login')
@@ -60,7 +60,7 @@ export class UserController {
   }
 
   @Post('list')
-  list(@Body() userId: any) {
+  list( @ExtractUserId() userId: string,y) {
     return this.userService.list(userId) 
   }
 

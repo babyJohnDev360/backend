@@ -30,8 +30,10 @@ export class UserService {
     private readonly authservice: AuthService,
   ) {}
 
-  async SignUp(createUserDto: CreateUserDto) {
+  async SignUp(userAdminId,createUserDto: CreateUserDto) {
     try {
+      const isAdmin = await this.checkUser(userAdminId)
+      if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
       const hashedPassword = crypto
         .createHash('sha256')
         .update(createUserDto.password)
