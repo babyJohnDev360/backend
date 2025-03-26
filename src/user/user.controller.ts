@@ -18,8 +18,10 @@ import { AuthGuard } from 'src/common/auth/guard/auth.guard';
 import { ExtractUserId } from 'src/common/auth/decorator/extract.token';
 import {
   CreateFundAllotDto,
+  FundAllotQueryByUserDto,
   FundAllotQueryDto,
   UpdateFundAllotDto,
+  UserListDto,
 } from 'src/common/DTO/fundAllot-user.dto';
 import {
   CreateServiceFeeDto,
@@ -44,7 +46,12 @@ export class UserController {
     return this.userService.login(loginUserDto);
   }
 
-  @Post('edit')
+  @Post('adminLogin')
+  AdminLogin(@Body() loginUserDto: LoginUserDto) {
+    return this.userService.adminLogin(loginUserDto);
+  }
+
+  @Post('edit') 
   @UseGuards(AuthGuard)
   EditUser(
     @ExtractUserId() userId: string,
@@ -60,8 +67,14 @@ export class UserController {
   }
 
   @Post('list')
-  list( @ExtractUserId() userId: string,y) {
-    return this.userService.list(userId) 
+  list( @ExtractUserId() userId: string,
+  @Body() UserListDto: UserListDto) {
+    return this.userService.list(UserListDto) 
+  }
+
+  @Get('userNameList')
+  userNameList( @ExtractUserId() userId: any,) {
+    return this.userService.userNameList(userId) 
   }
 
   @Post('addFund')
@@ -93,6 +106,14 @@ export class UserController {
     @Body() fundAllotQueryDto: FundAllotQueryDto,
   ) {
     return this.userService.getFund(userId, fundAllotQueryDto);
+  }
+
+  @Post('getFundByUserId')
+  @UseGuards(AuthGuard)
+  getFundByUserId(
+    @Body() FundAllotQueryByUserDto: FundAllotQueryByUserDto,
+  ) {
+    return this.userService.getFundByUserId(FundAllotQueryByUserDto);
   }
 
   @Post('addserviceFee')

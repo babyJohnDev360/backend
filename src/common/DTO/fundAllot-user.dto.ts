@@ -23,6 +23,22 @@ export class CreateFundAllotDto {
 //   @IsUUID()
 //   transactionId: Types.ObjectId;  // User ID, passed as ObjectId
 }
+export class UserListDto {
+  @IsString()
+  @IsOptional()
+  userId: string;
+
+  @IsNumber()
+  @IsOptional()
+  limit: number;
+
+  @IsNumber()
+  @IsOptional()
+  page: number;
+
+//   @IsUUID()
+//   transactionId: Types.ObjectId;  // User ID, passed as ObjectId
+}
 
 // Update FundAllot DTO
 export class UpdateFundAllotDto {
@@ -58,6 +74,22 @@ export class UpdateFundAllotDto {
 export class FundAllotQueryDto {
   @IsOptional()
   userId?: Types.ObjectId;  // Filter by User ID
+
+  @IsOptional()
+  @IsString()
+  source?: string;  // Filter by source
+
+  @IsOptional()
+  @IsNumber()
+  limit?: number;  // For pagination (optional)
+
+  @IsOptional()
+  @IsNumber()
+  page?: number;  // For pagination (optional)
+}
+export class FundAllotQueryByUserDto {
+  @IsNotEmpty()
+  userId?: string;  // Filter by User ID
 
   @IsOptional()
   @IsString()

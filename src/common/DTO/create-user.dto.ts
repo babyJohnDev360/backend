@@ -35,6 +35,9 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
+  @IsString()
+  clientId: string;
+
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
@@ -59,6 +62,10 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   password?: string;
+
+  @IsOptional()
+  @IsString()
+  clientId: string;
 
   @IsOptional()
   @IsString()

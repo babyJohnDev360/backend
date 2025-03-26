@@ -29,6 +29,9 @@ export class User {
     password  :string ;
 
     @Prop()
+    clientId  :string ;
+
+    @Prop()
     panNumber : string;
 
     @Prop({type :BankDetailsSchema} )

@@ -1,3 +1,4 @@
+import { FundAllotQueryByUserDto, UserListDto } from './../common/DTO/fundAllot-user.dto';
 import { Injectable } from '@nestjs/common';
 import {
   CreateUserDto,
@@ -20,6 +21,7 @@ import {
   CreateServiceFeeDto,
   UpdateServiceFeeDto,
 } from 'src/common/DTO/serviceFee-user.dto';
+import { skip } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -49,6 +51,8 @@ export class UserService {
       return {
         status: true,
         message: 'User Created Successfull',
+        userId:  newUser._id
+
       };
     } catch (error) {
       console.log(error.message);
@@ -77,6 +81,44 @@ export class UserService {
       status: true,
       messsage: 'Login successfull',
       token,
+    }
+   } catch (error) {
+    return {
+      status: false,
+      messsage: 'email or password is wrong ',
+    };
+    }
+  }
+  async adminLogin(loginUserDto: LoginUserDto) {
+    try {
+    const hashedPassword = crypto
+      .createHash('sha256')
+      .update(loginUserDto.password)
+      .digest('hex');
+    const checkUser = await this.UserModel.find({
+      email: loginUserDto.email,
+      password: hashedPassword,
+    });
+    if (!checkUser) {
+      return {
+        status: false,
+        messsage: 'email or password is wrong ',
+      };
+    }
+  console.log(checkUser,"============>");
+  
+    if(checkUser[0].role === "Admin"){
+      let token = await this.authservice.createAccessToken(checkUser[0]);
+       return {
+        status: true,
+        messsage: 'Login successfull',
+        token,
+      }
+    }else{
+      return {
+        status: false,
+        messsage: "Only Admin can Login",
+      }
     }
    } catch (error) {
     return {
@@ -125,19 +167,47 @@ export class UserService {
     }
   }
 
-  async list(userId: any) {
+  async list(UserListDto: UserListDto) {
     try {
-      let payload 
-      if(userId){
-        payload = {_id: new mongoose.Types.ObjectId(userId)}
-      }else{
-        payload = {}
+      let payload;
+      let skip = UserListDto.limit * UserListDto.page ;  // Skip the correct number of documents based on the page
+      let limit = UserListDto.limit;  // Limit is the number of items per page
+      
+      if (UserListDto.userId) {
+        payload = { _id: new mongoose.Types.ObjectId(UserListDto.userId) };
+      } else {
+        payload = {};
       }
-      const users = await this.UserModel.find(payload).select({ password: 0 });
+      
+      const users = await this.UserModel.find(payload)
+        .select({ password: 0 })
+        .skip(skip)
+        .limit(limit);      
       const count = await this.UserModel.countDocuments();
       return {
         status: true,
-        // totalPages: Math.ceil(count / query.limit),
+        total: count,
+        users,
+      };
+    } catch (error) {
+      console.log(error.message);
+      return {
+        status: false,
+        error: error.message,
+      };
+    }
+  }
+  async userNameList(UserId:any) {
+    try {
+      const isAdmin = await this.checkUser(UserId)
+      if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
+
+       let payload = { _id: new mongoose.Types.ObjectId(UserId) };
+       const users = await this.UserModel.find().select({ name: 1, _id : 1 })     
+      const count = await this.UserModel.countDocuments();
+      return {
+        status: true,
+        total: count,
         users,
       };
     } catch (error) {
@@ -246,6 +316,30 @@ export class UserService {
 
       return {
         status: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: error.message,
+      };
+    }
+  }
+
+
+  async getFundByUserId(FundAllotQueryByUserDto: FundAllotQueryByUserDto) {
+    try {
+      const { limit = 10, page = 0 } = FundAllotQueryByUserDto;
+      const skip = page * limit;
+      const data = await this.FundAllotModel.find({ userId:FundAllotQueryByUserDto.userId })
+        .sort({ updatedAt: -1 })
+        .limit(limit)
+        .skip(skip);
+        const count = await this.FundAllotModel.countDocuments({ userId:FundAllotQueryByUserDto.userId });
+
+      return {
+        status: true,
+        total : count,
         data,
       };
     } catch (error) {
