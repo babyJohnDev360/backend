@@ -437,6 +437,28 @@ export class UserService {
     }
   }
 
+  async getServiceFeeByUserId(fundAllotQueryDto: UserListDto) {
+    try {
+      const { limit = 50, page = 1 } = fundAllotQueryDto;
+      const skip = (page - 1) * limit;
+
+      const data = await this.ServiceFeeModel.find({ userId:fundAllotQueryDto.userId })
+        .sort({ updatedAt: -1 })
+        //.limit(limit)
+       // .skip(skip);
+
+      return {
+        status: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: error.message,
+      };
+    }
+  }
+
   async checkUser(userId){
     try {
       const userData = await this.UserModel.findById(userId)

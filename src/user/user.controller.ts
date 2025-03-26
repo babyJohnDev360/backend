@@ -148,4 +148,13 @@ export class UserController {
   ) {
     return this.userService.getServiceFee(userId, fundAllotQueryDto);
   }
+
+  @Post('getServiceFeeByUserId')
+  @UseGuards(AuthGuard)
+  getServiceFeeByUserId(
+    @ExtractUserId() userId: string,
+    @Body() UserListDto: UserListDto,
+  ) {
+    return this.userService.getServiceFeeByUserId(UserListDto);
+  }
 }
