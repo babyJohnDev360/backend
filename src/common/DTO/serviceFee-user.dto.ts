@@ -2,84 +2,50 @@
 import {
   IsNumber,
   IsString,
-  IsArray,
   IsNotEmpty,
   IsMongoId,
   IsEnum,
   IsOptional,
-  IsDateString,
-  IsObject,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-// DTO for Transaction
-export class TransactionDto {
-  @IsDateString()
-  data: Date;
-
-  @IsEnum(['fees Paid', 'Credit Note Applied'])
+// DTO for creating a Service Fee
+export class CreateServiceFeeDto {
+  @IsEnum(['fee_paid', 'credit_note', 'goodwill'], {
+    message: 'type must be one of the following values: fee_paid, credit_note, goodwill',
+  }) // Corrected enum values
   type: string;
 
   @IsNumber()
   amount: number;
+
+  @IsMongoId()  // Ensures that userId is a valid MongoDB ObjectId
+  userId: string;  // MongoDB ObjectId (refers to the User schema)
 }
 
-// DTO for Creating Service Fee
-export class CreateServiceFeeDto {
-  @IsString()
-  userId: string;
-
-  @IsNumber()
-  serviceFeePayable: number;
-
-  @IsNumber()
-  serviceFeePaid: number;
-
-  @IsNumber()
-  creditNoteApplied: number;
-
-  @IsNumber()
-  goodwillGesture: number;
-
-  @IsNumber()
-  balancePayable: number;
-
-  @IsArray()
-  @Type(() => TransactionDto)
-  transaction: TransactionDto[];
-}
-
-// DTO for Updating Service Fee
+// DTO for updating a Service Fee
 export class UpdateServiceFeeDto {
-  @IsMongoId()
-  serviceFeeId?: string;
+  @IsOptional()
+  @IsString()
+  serviceFeeId?: string;  // Optional, the ID of the service fee you want to update
 
   @IsOptional()
-  @IsNumber()
-  serviceFeePayable?: number;
+  @IsEnum(['fee_paid', 'credit_note', 'goodwill'], {
+    message: 'type must be one of the following values: fee_paid, credit_note, goodwill',
+  })  // Optional, ensures the type is one of the valid enum values
+  type?: string;
 
   @IsOptional()
-  @IsNumber()
-  serviceFeePaid?: number;
+  @IsMongoId()  // Ensures that userId is a valid MongoDB ObjectId
+  userId?: string;
 
   @IsOptional()
-  @IsNumber()
-  creditNoteApplied?: number;
+  @IsNumber()  // Optional, ensures the amount is a number
+  amount?: number;
+}
 
+// DTO for getting Service Fees by userId
+export class getServiceFeeDto {
   @IsOptional()
-  @IsNumber()
-  goodwillGesture?: number;
-
-  @IsOptional()
-  @IsNumber()
-  balancePayable?: number;
-
-  @IsOptional()
-  @IsMongoId()
-  userId?: string; // Reference to the User ID
-
-  @IsOptional()
-  @IsArray()
-  @Type(() => TransactionDto)
-  transaction?: TransactionDto[];
+  @IsMongoId()  // Ensures that userId is a valid MongoDB ObjectId
+  userId?: string;
 }

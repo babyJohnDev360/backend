@@ -25,6 +25,7 @@ import {
 } from 'src/common/DTO/fundAllot-user.dto';
 import {
   CreateServiceFeeDto,
+  getServiceFeeDto,
   UpdateServiceFeeDto,
 } from 'src/common/DTO/serviceFee-user.dto';
 
@@ -144,9 +145,9 @@ export class UserController {
   @UseGuards(AuthGuard)
   GetServiceFee(
     @ExtractUserId() userId: string,
-    @Body() fundAllotQueryDto: FundAllotQueryDto,
+    @Body() getServiceFeeDto: getServiceFeeDto,
   ) {
-    return this.userService.getServiceFee(userId, fundAllotQueryDto);
+    return this.userService.getServiceFee(userId, getServiceFeeDto);
   }
 
   @Post('getServiceFeeByUserId')

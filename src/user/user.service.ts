@@ -1,3 +1,4 @@
+import { TestingModule } from '@nestjs/testing';
 import { FundAllotQueryByUserDto, UserListDto } from './../common/DTO/fundAllot-user.dto';
 import { Injectable } from '@nestjs/common';
 import {
@@ -19,6 +20,7 @@ import {
 import { ServiceFee } from 'src/common/Schema/serviceFee.schema';
 import {
   CreateServiceFeeDto,
+  getServiceFeeDto,
   UpdateServiceFeeDto,
 } from 'src/common/DTO/serviceFee-user.dto';
 import { skip } from 'rxjs';
@@ -415,27 +417,59 @@ export class UserService {
     }
   }
 
-  async getServiceFee(userId, fundAllotQueryDto: FundAllotQueryDto) {
+  async getServiceFee(userId, getServiceFeeDto: getServiceFeeDto) {
     try {
-      const { limit = 50, page = 1 } = fundAllotQueryDto;
-      const skip = (page - 1) * limit;
-
-      const data = await this.ServiceFeeModel.find({ userId: userId })
+      const serviceData = await this.ServiceFeeModel.aggregate([
+        {
+          $match: { userId: userId }
+        },
+        {
+          $group: {
+            _id: "$type",
+            totalAmount: { $sum: "$amount" }
+          }
+        }
+      ]);
+  
+      const transaction = await this.ServiceFeeModel.find({ userId: userId });
+  
+      const feePaidData = serviceData.find(item => item._id === "fee_paid");
+      const creditNoteData = serviceData.find(item => item._id === "credit_note");
+      const goodwillData = serviceData.find(item => item._id === "goodwill");
+  
+      const totalAmount = serviceData.length > 0 ? serviceData[0].totalAmount : 0;
+  
+      const fundData = await this.FundAllotModel.find({ userId: userId })
         .sort({ updatedAt: -1 })
-        .limit(limit)
-        .skip(skip);
-
+        .limit(1);
+  
+      let thirtyPercent = 0;
+      if (fundData && fundData.length > 0) {
+        const serviceFeePayable = fundData[0].balance;
+        thirtyPercent = serviceFeePayable * 0.30;
+      }
+  
+      const data = {
+        serviceFeesPayable: thirtyPercent,
+        serviceFeePaid: feePaidData ? feePaidData.totalAmount : 0,
+        creditNoteApplied: creditNoteData ? creditNoteData.totalAmount : 0,
+        goodWillApplied: goodwillData ? goodwillData.totalAmount : 0,
+        balancePayable: thirtyPercent - (feePaidData?.totalAmount || 0) - (creditNoteData?.totalAmount || 0) - (goodwillData?.totalAmount || 0),
+        transaction: transaction
+      };
+  
       return {
         status: true,
-        data,
+        data: data
       };
     } catch (error) {
       return {
         status: false,
-        message: error.message,
+        message: error.message
       };
     }
   }
+  
 
   async getServiceFeeByUserId(fundAllotQueryDto: UserListDto) {
     try {
