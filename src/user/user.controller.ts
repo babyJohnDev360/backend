@@ -73,9 +73,10 @@ export class UserController {
     return this.userService.list(UserListDto) 
   }
 
-  @Get('userNameList')
-  userNameList( @ExtractUserId() userId: any,) {
-    return this.userService.userNameList(userId) 
+  @Post('userNameList')
+  userNameList( @ExtractUserId() userId: any,
+  @Body() UserListDto: UserListDto) {
+    return this.userService.userNameList(userId,UserListDto)
   }
 
   @Post('addFund')

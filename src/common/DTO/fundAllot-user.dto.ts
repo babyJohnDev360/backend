@@ -36,6 +36,10 @@ export class UserListDto {
   @IsOptional()
   page: number;
 
+  @IsString()
+  @IsOptional()
+  search: string;
+  
 //   @IsUUID()
 //   transactionId: Types.ObjectId;  // User ID, passed as ObjectId
 }

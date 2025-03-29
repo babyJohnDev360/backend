@@ -199,13 +199,25 @@ export class UserService {
       };
     }
   }
-  async userNameList(UserId:any) {
+  async userNameList(UserId:any,UserListDto) {
     try {
       const isAdmin = await this.checkUser(UserId)
       if(!isAdmin) return {status :false , message : "Only admin can add and update data"}
 
        let payload = { _id: new mongoose.Types.ObjectId(UserId) };
-       const users = await this.UserModel.find().select({ name: 1, _id : 1 })     
+       const searchQuery: any[] = [];
+
+       if (UserListDto.search) {
+        // Use $or to search across multiple fields
+        searchQuery.push({
+          $or: [
+            { clientId: { $regex: UserListDto.search, $options: 'i' } },
+            { name: { $regex: UserListDto.search, $options: 'i' } },
+            { email: { $regex: UserListDto.search, $options: 'i' } }
+          ]
+        });
+      }
+       const users = await this.UserModel.find({ $and: searchQuery }).select({ name: 1, _id : 1, clientId : 1 })     
       const count = await this.UserModel.countDocuments();
       return {
         status: true,
