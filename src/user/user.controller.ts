@@ -70,7 +70,7 @@ export class UserController {
   @Post('list')
   list( @ExtractUserId() userId: string,
   @Body() UserListDto: UserListDto) {
-    return this.userService.list(UserListDto) 
+    return this.userService.list(userId,UserListDto) 
   }
 
   @Post('userNameList')

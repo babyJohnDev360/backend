@@ -169,19 +169,30 @@ export class UserService {
     }
   }
 
-  async list(UserListDto: UserListDto) {
+  async list( userId,UserListDto: UserListDto) {
     try {
+      const isAdmin = await this.checkUser(userId)
       let payload;
       let skip = UserListDto.limit * UserListDto.page ;  // Skip the correct number of documents based on the page
       let limit = UserListDto.limit;  // Limit is the number of items per page
-      
-      if (UserListDto.userId) {
-        payload = { _id: new mongoose.Types.ObjectId(UserListDto.userId) };
-      } else {
-        payload = {};
-      }
-      
-      const users = await this.UserModel.find(payload)
+      if(isAdmin){
+        if (UserListDto.userId) {
+          payload = { _id: new mongoose.Types.ObjectId(UserListDto.userId) };
+        } else {
+          payload = {};
+        }
+        const users = await this.UserModel.find(payload)
+          .select({ password: 0 })
+          .skip(skip)
+          .limit(limit);      
+        const count = await this.UserModel.countDocuments();
+        return {
+          status: true,
+          total: count,
+          users,
+        }
+      } else{
+        const users = await this.UserModel.find({_id:new mongoose.Types.ObjectId(userId)})
         .select({ password: 0 })
         .skip(skip)
         .limit(limit);      
@@ -190,7 +201,9 @@ export class UserService {
         status: true,
         total: count,
         users,
-      };
+      }
+      }
+   
     } catch (error) {
       console.log(error.message);
       return {
@@ -217,7 +230,7 @@ export class UserService {
           ]
         });
       }
-       const users = await this.UserModel.find({ $and: searchQuery }).select({ name: 1, _id : 1, clientId : 1 })     
+       const users = await this.UserModel.find().select({ name: 1, _id : 1, clientId : 1 })     
       const count = await this.UserModel.countDocuments();
       return {
         status: true,
